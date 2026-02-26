@@ -65,6 +65,9 @@ test_*.py
 .coverage
 htmlcov/
 
+# Hypothesis test cache
+.hypothesis/
+
 # User data
 files/
 

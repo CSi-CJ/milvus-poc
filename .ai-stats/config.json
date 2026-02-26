@@ -1,0 +1,8 @@
+{
+  "default_model": "",
+  "default_format": "table",
+  "prompt_on_commit": "true",
+  "auto_detect": "true",
+  "watch_threshold_ms": "2000",
+  "watch_min_lines": "10"
+}

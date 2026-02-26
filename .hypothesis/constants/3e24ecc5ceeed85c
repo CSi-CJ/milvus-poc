@@ -1,4 +1,0 @@
-# file: C:\Users\cheng\AppData\Roaming\Python\Python311\site-packages\zipp\glob.py
-# hypothesis_version: 6.148.7
-
-['*', '**', '.*', '?*', 'Invalid separators', '[^/]', '\\*', '\\*\\*', '\\?', 'set']
