@@ -1,0 +1,85 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+nul
+*.tmp
+*.temp
+
+# Output directories
+output_*/
+temp_*/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Milvus data
+milvus_data/
+
+# Test files
+test_*.py
+!tests/test_*.py
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Coverage
+.coverage
+htmlcov/
+
+# User data
+files/
+
+# Reports
+reports/
+
+# Config with credentials
+config/config.json
+
+# Model cache
+models/
+
+# Uploads
+uploads/
+
+# Kiro specs (optional, project-specific)
+.kiro/
+.hypothesis/

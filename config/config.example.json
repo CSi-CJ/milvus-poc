@@ -1,0 +1,49 @@
+{
+  "milvus": {
+    "host": "localhost",
+    "port": 19530,
+    "user": "",
+    "password": "",
+    "database": "default",
+    "collection_name": "multimodal_files",
+    "vector_dim": 1024,
+    "index_type": "HNSW",
+    "metric_type": "COSINE",
+    "index_params": {
+      "M": 16,
+      "efConstruction": 200
+    }
+  },
+  "embedding": {
+    "text_model": "BAAI/bge-m3",
+    "image_model": "BAAI/bge-m3",
+    "audio_model": "BAAI/bge-m3",
+    "multimodal_model": "BAAI/bge-m3",
+    "batch_size": 12,
+    "max_length": 8192,
+    "use_openai_api": false,
+    "openai_model": "text-embedding-3-small",
+    "use_fp16": true,
+    "normalize_embeddings": true
+  },
+  "processing": {
+    "max_concurrent": 10,
+    "chunk_size": 1000,
+    "supported_extensions": [
+      ".pdf", ".txt", ".md", ".doc", ".docx",
+      ".png", ".jpg", ".jpeg", ".gif", ".bmp",
+      ".mp3", ".wav", ".m4a",
+      ".mp4", ".avi", ".mov"
+    ],
+    "skip_existing": true,
+    "enable_ocr": true,
+    "enable_speech_recognition": true
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "file_path": "logs/multimodal_indexer.log",
+    "max_file_size": 10485760,
+    "backup_count": 5
+  }
+}

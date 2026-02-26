@@ -1,0 +1,50 @@
+# 核心依赖
+pymilvus>=2.4.0
+numpy>=1.21.0
+
+# 文件解析依赖
+PyMuPDF>=1.23.0  # PDF 解析
+Pillow>=9.0.0    # 图像处理
+python-docx>=0.8.11  # Word 文档
+python-magic>=0.4.27  # 文件类型检测
+
+# OCR 依赖
+pytesseract>=0.3.10  # OCR 文本提取
+easyocr>=1.7.0  # 多语言 OCR
+paddleocr>=3.3.0  # 中文 OCR 优化
+baidu-aip>=4.16.0  # 百度 OCR API
+layoutparser>=0.3.4  # 文档布局分析
+
+# 音频处理依赖
+librosa>=0.10.0  # 音频分析
+soundfile>=0.12.0  # 音频文件读写
+openai-whisper>=20231117  # 语音识别
+
+# 视频处理依赖
+opencv-python>=4.8.0  # 视频处理
+ffmpeg-python>=0.2.0  # 视频音频提取
+scenedetect[opencv]>=0.6.0  # 视频场景检测（可选）
+ImageHash>=4.3.0  # 图像哈希去重
+
+# 嵌入模型依赖 - 使用 BGE-M3 多模态模型
+FlagEmbedding>=1.2.0  # BGE-M3 多模态嵌入模型
+sentence-transformers>=2.2.0  # 备用文本嵌入
+transformers>=4.30.0  # 预训练模型基础
+torch>=2.0.0  # PyTorch
+
+# 可选：OpenAI API 支持
+# openai>=1.0.0  # OpenAI API
+
+# 工具依赖
+tqdm>=4.65.0  # 进度条
+click>=8.0.0  # 命令行界面
+pydantic>=2.0.0  # 数据验证
+chardet>=5.0.0  # 编码检测
+
+# 开发依赖（可选）
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+hypothesis>=6.0.0
+black>=23.0.0
+flake8>=6.0.0
+flask>=3.1.3

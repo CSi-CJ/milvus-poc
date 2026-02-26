@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多模态文件索引系统 - 搜索界面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .search-section {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        
+        .top-k-input {
+            width: 100px;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .search-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .stats-section {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4facfe;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .results-section {
+            padding: 30px;
+        }
+        
+        .results-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .results-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .results-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4facfe;
+            transition: transform 0.2s;
+        }
+        
+        .result-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .result-score {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .result-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            min-width: 80px;
+        }
+        
+        .info-value {
+            color: #333;
+            word-break: break-all;
+        }
+        
+        .chunk-content-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .chunk-content-title {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .content-toggle {
+            background: #4facfe;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+        }
+        
+        .chunk-content {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.9em;
+            line-height: 1.5;
+            color: #333;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .chunk-content.image-content {
+            background: #f0f8ff;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .image-display {
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .image-display img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .image-display img:hover {
+            transform: scale(1.02);
+        }
+        
+        .image-info {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .ocr-text-section {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #28a745;
+        }
+        
+        .ocr-text-title {
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 5px;
+        }
+        
+        .ocr-text-content {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.4;
+            color: #333;
+        }
+        
+        .audio-transcript-section {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f8ff;
+            border-radius: 6px;
+            border-left: 3px solid #007bff;
+        }
+        
+        .audio-transcript-title {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        
+        .audio-transcript-content {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.4;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .audio-transcript-meta {
+            font-size: 0.8em;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            cursor: pointer;
+        }
+        
+        .image-modal img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+        
+        .chunk-content.text-content {
+            background: #f8f9fa;
+            border-left: 4px solid #28a745;
+        }
+        
+        .chunk-content.audio-content {
+            background: #fff8f0;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .content-type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+        
+        .content-type-badge.image {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .content-type-badge.text {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .content-type-badge.audio {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .chunk-summary {
+            background: #e3f2fd;
+            padding: 8px;
+            border-radius: 4px;
+            font-style: italic;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+        
+        .content-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .metadata-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .metadata-title {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        
+        .metadata-content {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #666;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #c33;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #999;
+        }
+        
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .stats-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 多模态文件索引系统</h1>
+            <p>基于 BGE-M3 和 Milvus 的智能文档检索</p>
+        </div>
+        
+        <div class="search-section">
+            <div class="search-form">
+                <input type="text" id="queryInput" class="search-input" placeholder="输入搜索查询..." />
+                <input type="number" id="topKInput" class="top-k-input" value="10" min="1" max="100" title="返回结果数量" />
+                <button id="searchBtn" class="search-btn">搜索</button>
+            </div>
+        </div>
+        
+        <div class="stats-section" id="statsSection">
+            <div class="stat-item">
+                <div class="stat-value" id="totalDocs">-</div>
+                <div class="stat-label">总文档数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="vectorDim">-</div>
+                <div class="stat-label">向量维度</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="modelName">-</div>
+                <div class="stat-label">嵌入模型</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="connectionStatus">-</div>
+                <div class="stat-label">连接状态</div>
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <div id="resultsContainer">
+                <div class="empty-state">
+                    <h3>🚀 开始搜索</h3>
+                    <p>在上方输入框中输入查询内容，点击搜索按钮开始检索相关文档</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图像模态框 -->
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <img id="modalImage" src="" alt="放大图像" />
+    </div>
+
+    <script>
+        // 全局变量
+        let isSearching = false;
+        
+        // DOM 元素
+        const queryInput = document.getElementById('queryInput');
+        const topKInput = document.getElementById('topKInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            
+            // 绑定事件
+            searchBtn.addEventListener('click', performSearch);
+            queryInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        });
+        
+        // 加载系统统计信息
+        async function loadStats() {
+            try {
+                const response = await fetch('/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalDocs').textContent = data.collection_stats.num_entities || 0;
+                    document.getElementById('vectorDim').textContent = data.embedder_info.vector_dimension || '-';
+                    document.getElementById('modelName').textContent = data.embedder_info.model_name || '-';
+                    document.getElementById('connectionStatus').textContent = data.health.connected ? '✓ 已连接' : '✗ 断开';
+                }
+            } catch (error) {
+                console.error('加载统计信息失败:', error);
+            }
+        }
+        
+        // 执行搜索
+        async function performSearch() {
+            const query = queryInput.value.trim();
+            const topK = parseInt(topKInput.value) || 10;
+            
+            if (!query) {
+                alert('请输入搜索查询');
+                return;
+            }
+            
+            if (isSearching) return;
+            
+            isSearching = true;
+            searchBtn.disabled = true;
+            searchBtn.textContent = '搜索中...';
+            
+            // 显示加载状态
+            resultsContainer.innerHTML = '<div class="loading">🔄 正在搜索...</div>';
+            
+            try {
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        top_k: topK
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    displayError(data.error || '搜索失败');
+                }
+                
+            } catch (error) {
+                displayError('网络错误: ' + error.message);
+            } finally {
+                isSearching = false;
+                searchBtn.disabled = false;
+                searchBtn.textContent = '搜索';
+            }
+        }
+        
+        // 显示搜索结果
+        function displayResults(data) {
+            if (data.results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <h3>😔 未找到相关结果</h3>
+                        <p>查询: "${data.query}"</p>
+                        <p>尝试使用不同的关键词或检查拼写</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <div class="results-header">
+                    <div class="results-title">搜索结果</div>
+                    <div class="results-meta">查询: "${data.query}" | 找到 ${data.total} 个结果</div>
+                </div>
+            `;
+            
+            data.results.forEach((result, index) => {
+                // 根据内容类型确定图标和样式
+                let contentIcon = '📄';
+                let contentClass = 'text-content';
+                let contentTypeLabel = result.content_type;
+                
+                if (result.content_type === 'image') {
+                    contentIcon = '🖼️';
+                    contentClass = 'image-content';
+                    contentTypeLabel = '图像内容';
+                } else if (result.content_type === 'audio') {
+                    contentIcon = '🎵';
+                    contentClass = 'audio-content';
+                    contentTypeLabel = '音频内容';
+                } else if (result.content_type === 'text') {
+                    contentIcon = '📝';
+                    contentClass = 'text-content';
+                    contentTypeLabel = '文本内容';
+                }
+                
+                html += `
+                    <div class="result-item">
+                        <div class="result-header">
+                            <h4>结果 #${index + 1} ${contentIcon}</h4>
+                            <div class="result-score">相似度: ${result.score}</div>
+                        </div>
+                        
+                        <div class="result-info">
+                            <div class="info-item">
+                                <span class="info-label">文件:</span>
+                                <span class="info-value">${result.file_name || result.file_path}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">类型:</span>
+                                <span class="info-value">${result.file_type} / ${contentTypeLabel}
+                                    <span class="content-type-badge ${result.content_type}">${result.content_type}</span>
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">块索引:</span>
+                                <span class="info-value">${result.chunk_index}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">距离:</span>
+                                <span class="info-value">${result.distance}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">ID:</span>
+                                <span class="info-value">${result.id}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">路径:</span>
+                                <span class="info-value">${result.file_path}</span>
+                            </div>
+                        </div>
+                        
+                        ${result.chunk_content ? `
+                            <div class="chunk-content-section">
+                                <div class="chunk-content-title">
+                                    ${contentIcon} ${contentTypeLabel}
+                                    <button class="content-toggle" onclick="toggleContent(${index})">
+                                        <span id="toggle-text-${index}">展开</span>
+                                    </button>
+                                </div>
+                                
+                                ${result.chunk_summary ? `
+                                    <div class="chunk-summary">
+                                        📝 摘要: ${result.chunk_summary}
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="content-stats">
+                                    <span>📊 长度: ${result.content_length || 0} 字符</span>
+                                    <span>🏷️ 类型: ${contentTypeLabel}</span>
+                                    ${result.has_image ? `<span>🖼️ 包含图像</span>` : ''}
+                                    ${result.audio_transcript ? `<span>🎤 包含转录</span>` : ''}
+                                </div>
+                                
+                                <div class="chunk-content ${contentClass}" id="content-${index}" style="display: none;">
+                                    ${result.has_image ? `
+                                        <div class="image-display">
+                                            <img src="data:image/${result.image_format.toLowerCase()};base64,${result.image_data}" 
+                                                 alt="图像 ${result.chunk_index}" 
+                                                 onclick="showImageModal('${result.image_data}', '${result.image_format}')" />
+                                            <div class="image-info">
+                                                格式: ${result.image_format} | 尺寸: ${result.image_size}
+                                            </div>
+                                        </div>
+                                        ${result.ocr_text ? `
+                                            <div class="ocr-text-section">
+                                                <div class="ocr-text-title">🔍 OCR提取的文本内容:</div>
+                                                <div class="ocr-text-content">${escapeHtml(result.ocr_text)}</div>
+                                            </div>
+                                        ` : ''}
+                                    ` : ''}
+                                    
+                                    ${result.audio_transcript ? `
+                                        <div class="audio-transcript-section">
+                                            <div class="audio-transcript-title">🎤 语音转录内容:</div>
+                                            <div class="audio-transcript-content">${escapeHtml(result.audio_transcript)}</div>
+                                            ${result.audio_language && result.audio_language !== 'unknown' ? `
+                                                <div class="audio-transcript-meta">
+                                                    语言: ${result.audio_language} 
+                                                    ${result.audio_confidence ? `| 置信度: ${(result.audio_confidence * 100).toFixed(1)}%` : ''}
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    ` : ''}
+                                    
+                                    <div style="margin-top: ${result.has_image || result.audio_transcript ? '10px' : '0'};">
+                                        ${escapeHtml(result.chunk_content)}
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${Object.keys(result.metadata || {}).length > 0 ? `
+                            <div class="metadata-section">
+                                <div class="metadata-title">📋 元数据</div>
+                                <div class="metadata-content">${JSON.stringify(result.metadata, null, 2)}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+        }
+        
+        // 显示错误信息
+        function displayError(message) {
+            resultsContainer.innerHTML = `
+                <div class="error">
+                    <strong>❌ 搜索失败</strong><br>
+                    ${message}
+                </div>
+            `;
+        }
+        
+        // 切换内容显示
+        function toggleContent(index) {
+            const content = document.getElementById(`content-${index}`);
+            const toggleText = document.getElementById(`toggle-text-${index}`);
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggleText.textContent = '折叠';
+            } else {
+                content.style.display = 'none';
+                toggleText.textContent = '展开';
+            }
+        }
+        
+        // HTML转义函数
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // 显示图像模态框
+        function showImageModal(imageData, imageFormat) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            
+            modalImage.src = `data:image/${imageFormat.toLowerCase()};base64,${imageData}`;
+            modal.style.display = 'block';
+        }
+        
+        // 关闭图像模态框
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+        }
+        
+        // 全局函数，供HTML调用
+        window.toggleContent = toggleContent;
+        window.showImageModal = showImageModal;
+        window.closeImageModal = closeImageModal;
+    </script>
+</body>
+</html>
